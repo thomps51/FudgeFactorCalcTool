@@ -1,0 +1,14 @@
+This program will take the output from pskim, bin the variables into eta and et, 
+and then calculate the fudge factors with errors.
+
+PUT YOUR INPUT FILES IN Config.C!!!!!
+
+You need to put the source files in the main.C file
+Configuration options are in Config.C
+
+Run like:
+source setup.sh   # mainly to use root libs and c++11
+make              # make sure it is compiled
+./getFFsFromPskim # run the command
+
+
