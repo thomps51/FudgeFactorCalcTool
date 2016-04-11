@@ -7,7 +7,7 @@ public:
   progress_bar(uint64_t ticks)
     : _total_ticks(ticks), _ticks_occurred(0),
       _begin(std::chrono::steady_clock::now()),
-      barWidth(70),progress(0.0),progressTicks(1.0/ticks)
+      barWidth(55),progress(0.0),progressTicks(1.0/ticks)
 //  ...
     {
       int pos = barWidth * progress;
@@ -66,7 +66,7 @@ public:
             else if (i == pos) std::cout << ">";
             else std::cout << " ";
         }
-        std::cout << "] " << int(100.0) << " \% : Total Time: "<< minTaken <<"m"<<secTaken<<"s" << std::endl;;
+        std::cout << "] " << int(100.0) << " \% : "<< minTaken <<"m"<<secTaken<<"s taken" << std::endl;
   }
 private:
   typedef std::chrono::steady_clock Clock;
