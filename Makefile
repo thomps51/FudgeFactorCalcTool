@@ -12,7 +12,7 @@ OBJS = libs/Config.o libs/BinnedHistGetter.o libs/BinnedHistGetterNTUP.o libs/PD
 DEPS = include/Config.h include/progress_bar.h include/BinnedHistGetter.h include/BinnedHistGetterNTUP.h include/PDFgetter.h include/FFcalc.h utils/getFFsFromPskim.C utils/getFFsFromPDFs.C utils/test.C utils/getFFsFromNTUP.C utils/getBinnedHistsFromNTUP.C
 
 
-all: getFFsFromPskim getFFsFromPDFs test getFFsFromNTUP getBinnedHistsFromNTUP
+all: getFFsFromPskim getFFsFromPDFs test getFFsFromNTUP getBinnedHistsFromNTUP getFFsFromBinnedHists
  
 
 %.o: %.C $(DEPS)
@@ -38,6 +38,8 @@ libs/BinnedHistGetterNTUP.o: Root/BinnedHistGetterNTUP.C $(DEPS)
 		$(CXX) -c -o $@ $< $(CXXFLAGS) $(ROOTCORE_INCL)
 getFFsFromPskim: $(OBJS)
 	$(CXX) -o $@ $(OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getFFsFromPskim.C 
+getFFsFromBinnedHists: $(OBJS)
+	$(CXX) -o $@ $(OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getFFsFromBinnedHists.C 
 getFFsFromNTUP: $(OBJS)
 	$(CXX) -o $@ $(OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getFFsFromNTUP.C 
 getFFsFromPDFs: $(OBJS)
