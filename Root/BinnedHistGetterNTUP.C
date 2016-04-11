@@ -31,7 +31,7 @@ void BinnedHistGetterNTUP::init(){
   mc_channel_number=0; ph_tight_mc15=0;
   ph_loose_mc15=0; ph_ptcone20=0; mc_gen_weight=0;
  
-  for(int i = 0; i< Config::Nvars ; i++)
+  for(int i = 0; i< Config::NvarsInputNTUP ; i++)
   {
     string inputvarname = (noFF) ? Config::InputVarsNoFFNTUP[i] : Config::InputVarsNTUP[i] ;
     ttree->SetBranchAddress(inputvarname.c_str(), &inputVars[inputvarname] );
@@ -140,7 +140,7 @@ bool BinnedHistGetterNTUP::Cut(){
         if( fabs(ph_eta) > Config::etaBins[j] && fabs(ph_eta) < Config::etaBins[j+1] && ph_pt/1000 > Config::etBins[i] && ph_pt/1000 < Config::etBins[i+1])
         {
           int count=0;
-          for(int var = 0; var< Config::Nvars + 1 ; var++) 
+          for(int var = 0; var< Config::NvarsInputNTUP ; var++) 
           {
             string inputvarname = (noFF)  ? Config::InputVarsNoFFNTUP[var] : Config::InputVarsNTUP[var] ;
             string rhadname =     (noFF)  ? "ph_noFF_rhad"  : "ph_rhad";
