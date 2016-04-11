@@ -4,29 +4,38 @@
 using namespace std;
 
 
-BinnedHistGetter::BinnedHistGetter(string inputFile,string data_type){
-  f = new TFile(inputFile.c_str());
+BinnedHistGetter::BinnedHistGetter(string inputFile,string convSt, string data_type){
+  f = TFile::Open(inputFile.c_str());
   inputFileName=f->GetName();
   dataType=data_type;
+  if (dataType != "data" && dataType != "mc")
+  {
+    cerr << "BinnedHistGetter::datatype not set to data or mc, please check arguments!" << endl;
+  }
+  convStatus=convSt;
+  if (convSt != "u" && convSt != "c")
+  {
+    cerr << "BinnedHistGetter::convStatus not set to c or u, please check arguments!" << endl;
+  } 
+  for(int i =0; i< Config::NvarsInputPskim ; i++)
+  {
+    inputVars[Config::InputVarsPskim[i]] = 0;
+  }  
 }
 void BinnedHistGetter::init(){
-  //f = new TFile(inputFileName.c_str());
   ttree = (TTree*)f->Get("tree");
   
-  ph_pt=0;    ph_eta=0;   ph_phi=0;   ph_reta=0;
-  ph_rphi=0;  ph_weta2=0; ph_w1=0;    ph_wstot=0;
-  ph_fside=0; ph_rhad=0;  ph_rhad1=0; ph_weight=0;
+  ph_pt=0;    ph_eta=0;   ph_phi=0; 
+  ph_weight=0;
+
+  for(int i = 0; i< Config::NvarsInputPskim ; i++)
+  {
+    string inputvarname = Config::InputVarsPskim[i] ;
+    ttree->SetBranchAddress(inputvarname.c_str(), &inputVars[inputvarname] );
+  }
 
   ttree->SetBranchAddress("ph_eta", &ph_eta);
   ttree->SetBranchAddress("ph_phi", &ph_phi);
-  ttree->SetBranchAddress("ph_reta", &ph_reta);
-  ttree->SetBranchAddress("ph_rphi", &ph_rphi);
-  ttree->SetBranchAddress("ph_weta2", &ph_weta2);
-  ttree->SetBranchAddress("ph_w1", &ph_w1);
-  ttree->SetBranchAddress("ph_wstot", &ph_wstot);
-  ttree->SetBranchAddress("ph_fside", &ph_fside);
-  ttree->SetBranchAddress("ph_rhad", &ph_rhad);
-  //ttree->SetBranchAddress("ph_rhad1", &ph_rhad1);
   ttree->SetBranchAddress("ph_weight", &ph_weight);
   ttree->SetBranchAddress("ph_pt", &ph_pt);
 
@@ -36,38 +45,28 @@ void BinnedHistGetter::makeHistos(){
 for(int var = 0; var < Config::Nvars; var++)
   {
     vector<vector<TH1F * > > VarHists;
-    //vector<string> VarHistNames;
     for(int etBin =0;etBin<Config::NetBins;etBin++)
     {
       vector<TH1F * > VarEtHists;
       for(int etaBin=0; etaBin<Config::NetaBins;etaBin++)
       {
-        string histName = Config::varsN[var]+"_";
-        histName.append(Config::etNames[etBin]);
-        histName.append(Config::etaNames[etaBin]);
-        //VarHistNames.push_back(histName);
-        //VarHists.push_back(new TH1F(histName.c_str(),histName.c_str(),Nbins,xmins[var],xmaxs[var]));
+        string histName = Config::varsN[var]+"_"+ Config::etNames[etBin] + Config::etaNames[etaBin] + "_" + convStatus ;
         VarEtHists.push_back(new TH1F(histName.c_str(),histName.c_str(),Config::Nbins,Config::xmins[var],Config::xmaxs[var])); 
       }
       VarHists.push_back(VarEtHists);
     }
     hists.push_back(VarHists);
-    //histnames.push_back(VarHistNames);
   }
 }
 
 void BinnedHistGetter::LoopOverFile(){
   cout << "Looping over file: " << inputFileName << endl;
   long nentries = (long)ttree->GetEntries();
-  int Nvars = Config::Nvars;
-  //float progress=0.0;
   progress_bar bar(100);
   for (Int_t i=0;i<nentries;i++) {
     ttree->GetEntry(i);
     for(int i=0;i<Config::NetBins;i++)
     {
-      if(ph_pt->at(0) < Config::etBins[i]) // just to speed up
-        continue;
       for(int j=0;j<Config::NetaBins;j++)
       {
 
@@ -75,52 +74,34 @@ void BinnedHistGetter::LoopOverFile(){
         {
           float weight = 1;
           if (dataType=="mc") weight = ph_weight->at(0);
-          hists[0][i][j]->Fill(ph_reta->at(0)     ,weight);
-          if(Nvars < 2) continue;
-          hists[1][i][j]->Fill(ph_rphi->at(0)     ,weight);
-          if(Nvars < 3) continue;
-          hists[2][i][j]->Fill(ph_weta2->at(0)    ,weight);
-          if(Nvars < 4) continue;
-          hists[3][i][j]->Fill(ph_w1->at(0)       ,weight);
-          if(Nvars < 5) continue;
-          hists[4][i][j]->Fill(ph_wstot->at(0)    ,weight);
-          if(Nvars < 6) continue;
-          hists[5][i][j]->Fill(ph_fside->at(0)    ,weight);
-          if(Nvars < 7) continue;
-          hists[6][i][j]->Fill(ph_rhad->at(0)     ,weight);
-          //hists[7][i][j]->Fill(ph_rhad1->at(0)    );// ,ph_weight->at(0));
-          //hists[8][i][j]->Fill(ph_pt->at(0)/1000  );// ,ph_weight->at(0));
-          //hists[9][i][j]->Fill(ph_eta->at(0)      );// ,ph_weight->at(0));
+          
+          for(int var = 0; var< Config::Nvars ; var++)
+          {
+            string inputvarname = Config::InputVarsPskim[var] ;
+            float value         = inputVars[inputvarname]->at(0);
+            hists[var][i][j]->Fill(value, weight);
+          }
         }
       }
     }
-    //if(i % (nentries/100) == 0 ) progress += 0.01;
     if(i % (nentries/100) == 0 ) bar.tick();
   }
   bar.end();
-  //int barWidth=70;
-  //std::cout << "[";
-  //int pos = barWidth * 1.0;
-  //for (int i = 0; i < barWidth; ++i) {
-  //    if (i < pos) std::cout << "=";
-  //    else if (i == pos) std::cout << ">";
-  //    else std::cout << " ";
-  //} 
-  //std::cout << "] " << int(100.0) << " %\r";
-  //std::cout.flush(); 
-  //std::cout << endl;
 }
-
-
-
-
-
-int BinnedHistGetter::main(string file)
+void BinnedHistGetter::writeHistsToFile()
 {
-  std::cout << "help me" << std::endl;
-
-
-
-  return 1;
+  string filename = "output/hists/hists_" + dataType + "_"+convStatus  + ".root";
+  TFile f(filename.c_str(),"recreate");
+  for(int var =0 ; var < Config::Nvars; var++ )
+  {
+      for(int etBin =0; etBin < Config::NetBins ; etBin++)
+      {
+          for(int etaBin = 0; etaBin < Config::NetaBins;etaBin++ )
+          {
+              hists[var][etBin][etaBin]->Write();
+          }
+      }
+  }
+  cout << convStatus << " binned "<< dataType << " hists written to file: " << filename << endl;
+  f.Close();
 }
-
