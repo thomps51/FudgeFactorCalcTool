@@ -24,7 +24,7 @@ class FFcalc
     
     FFcalc(vector<vector<vector<TH1 *> > > &data_PDFs ,vector<vector<vector<TH1 *> > > &mc_PDFs, string convSt);
     FFcalc(string data_PDFs_filename ,string mc_PDFs_filename, string convSt);
-    ~FFcalc();
+    //~FFcalc();
     vector<vector<vector<TH1 *> > > getPDFsFromFile(string filename);
     // also add constructor for doing it from PDFs file
     FudgeFactor GetFF(TH1 * dataHist, TH1 * mcHist, int var, int etBin, int etaBin);
