@@ -10,12 +10,20 @@ PDFgetter::PDFgetter(vector<vector<vector<TH1F *> > > &Hists, string convSt, str
 {
     hists      = Hists;
     convStatus = convSt;
+    if (convSt != "u" && convSt != "c")
+    {
+      cerr << "PDFgetter::convStatus not set to c or u, please check arguments!" << endl;
+    }
     datatype   = data_type;
+    if (datatype != "data" && datatype != "mc")
+    {
+      cerr << "PDFgetter::datatype not set to data or mc, please check arguments!" << endl;
+    }
 }
 PDFgetter::PDFgetter(string inputfilename, string convSt, string data_type)
 {
-  hists=getHistsFromFile(inputfilename);
   convStatus = convSt;
+  hists=getHistsFromFile(inputfilename);
   datatype   = data_type;
 }
 
@@ -31,6 +39,7 @@ vector<vector<vector<TH1F *> > > PDFgetter::getHistsFromFile(string filename)
       vector<TH1F *> VarEtHists;
       for(int etaBin=0;etaBin<Config::NetaBins;etaBin++)
       {
+        
         string histName=Config::varsN[var] + "_" + Config::etNames[etBin]+Config::etaNames[etaBin]+"_"+convStatus;
         TH1F * hist = (TH1F *) f->Get(histName.c_str());
         if(hist == 0){
@@ -43,20 +52,6 @@ vector<vector<vector<TH1F *> > > PDFgetter::getHistsFromFile(string filename)
     Hists.push_back(VarHists);
   }
   return Hists;
-}
-
-
-float getKDEFineFactor(string var)
-{
-    if(var ==  "f1")    return 0.9 ;
-    if(var ==  "fside") return 1.2 ;
-    if(var ==  "reta")  return 1.5 ;
-    if(var ==  "rphi")  return 3   ;
-    if(var ==  "rhad")  return 2   ;
-    if(var ==  "weta2") return 15  ;
-    if(var ==  "w1")    return 2   ;
-    if(var ==  "wstot") return 0.6 ;
-    return 1;
 }
 float getScaleFactor(TH1F * href, TH1* h)
 {
@@ -79,7 +74,7 @@ vector<vector<vector<TH1 *> > > PDFgetter::makeSmoothedPDFs()
     for(int var =0 ; var < Config::Nvars; var++ )
     {
         vector<vector<TH1 * > > VarPDFs(Config::NetBins);
-        float kdeFF = getKDEFineFactor(Config::varsN[var]);
+        float kdeFF = Config::KDEFineFactors[var];
         for(int etBin =0; etBin < Config::NetBins ; etBin++)
         {
           vector<TH1 * > VarEtPDFs(Config::NetaBins);
@@ -112,7 +107,7 @@ void PDFgetter::getPDFsForVar(unsigned var)
   usleep(var*100000); // hack for parallel running, the damn TMVA::PDF creation stdouts happening at the same time cause segfaults
 
   vector<vector<TH1 * > > VarPDFs(Config::NetBins);
-  float kdeFF = getKDEFineFactor(Config::varsN[var]);
+  float kdeFF = Config::KDEFineFactors[var];
   for(int etBin =0; etBin < Config::NetBins ; etBin++)
   {
     
