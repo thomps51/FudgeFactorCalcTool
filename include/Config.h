@@ -9,11 +9,15 @@ class Config{
     static std::string inputPskimmedPathDataUnconv;
     static std::string inputPskimmedPathMCconv    ;
     static std::string inputPskimmedPathMCunconv  ;
-    
+    static int NvarsInputPskim;
+    static std::string InputVarsPskim [];
+
+
     static int NvarsInputNTUP;
     static std::string InputVarsNTUP [];
     static std::string InputVarsNoFFNTUP [];
 
+    static float KDEFineFactors [];
     static int NetBins;
     static int NetaBins;
     static int Nvars;
