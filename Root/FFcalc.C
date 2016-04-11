@@ -8,27 +8,20 @@ FFcalc::FFcalc(vector<vector<vector<TH1 *> > > &data_PDFs ,vector<vector<vector<
   dataPDFs   = data_PDFs;
   mcPDFs     = mc_PDFs;
   convStatus = convSt;
+  if (convSt != "u" && convSt != "c")
+  {
+    cerr << "FFcalc::convStatus not set to c or u, please check arguments!" << endl;
+  }
 }
 FFcalc::FFcalc(string data_PDFs_filename ,string mc_PDFs_filename, string convSt)
 {
   convStatus = convSt;
+  if (convSt != "u" && convSt != "c")
+  {
+    cerr << "FFcalc::convStatus not set to c or u, please check arguments!" << endl;
+  }
   dataPDFs = getPDFsFromFile(data_PDFs_filename);
   mcPDFs = getPDFsFromFile(mc_PDFs_filename);
-}
-FFcalc::~FFcalc()
-{
-  for(int var = 0;var<Config::Nvars;var++)
-  {
-    for(int etBin=0;etBin<Config::NetBins;etBin++)
-    {
-      for(int etaBin=0;etaBin<Config::NetaBins;etaBin++)
-      {
-        //cout << "test" << endl;
-        //delete chiSqPlots[var][etBin][etaBin];
-        //delete ;
-      }
-    }
-  }
 }
 vector<vector<vector<TH1 *> > > FFcalc::getPDFsFromFile(string filename)
 {
