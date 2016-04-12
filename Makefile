@@ -1,10 +1,9 @@
 
-
 ROOTCFLAGS := $(shell root-config --cflags)
 ROOTLIBS := $(shell root-config --libs) -lMinuit -lEG -lTMVA 
 CXX = g++
 
-CXXFLAGS  = -I. -I$(ROOTSYS)/include -O -Wall -fopenmp -fPIC -Wno-reorder -g -std=c++1y # -pg
+CXXFLAGS  = -I. -I$(ROOTSYS)/include -O -Wall -fopenmp -fPIC -Wno-reorder -g  
 CXXFLAGS += $(ROOTCFLAGS)
 LIBS    = $(ROOTLIBS) 
 
