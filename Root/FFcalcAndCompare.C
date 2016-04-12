@@ -46,7 +46,7 @@ vector<vector<vector<TH1 *> > > FFcalcAndCompare::getPDFsFromFile(string filenam
       vector<TH1 *> VarEtPDFs;
       for(int etaBin=0;etaBin<Config::NetaBins;etaBin++)
       {
-        string histName=Config::varsN[var] + "_" + Config::etNames[etBin]+Config::etaNames[etaBin]+"_smoothed_hist_from_KDE";
+        string histName=Config::varsN[var] + "_" + Config::etNames[etBin]+Config::etaNames[etaBin]+"_"+convStatus+"_smoothed_hist_from_KDE";
         TH1 * hist = (TH1 *) f->Get(histName.c_str());
         if(hist == 0){
           cout << "Error! Hist " << histName << " not found!!!" << endl;
