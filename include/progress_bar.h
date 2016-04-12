@@ -1,3 +1,5 @@
+#ifndef PROGRESS_BAR_H
+#define PROGRESS_BAR_H
 #include <chrono>
 #include <iostream>
 class progress_bar
@@ -8,9 +10,9 @@ public:
     : _total_ticks(ticks), _ticks_occurred(0),
       _begin(std::chrono::steady_clock::now()),
       barWidth(55),progress(0.0),progressTicks(1.0/ticks)
-//  ...
     {
       int pos = barWidth * progress;
+      std::cout << "[";
       for (int i = 0; i < barWidth; ++i) {
         if (i < pos) std::cout << "=";
         else if (i == pos) std::cout << ">";
@@ -72,7 +74,6 @@ private:
   typedef std::chrono::steady_clock Clock;
   typedef Clock::time_point time_point;
   typedef Clock::period period;
-  //typedef Clock::duration duration;
   typedef std::chrono::duration<float, period> duration;
   std::uint64_t _total_ticks;
   std::uint64_t _ticks_occurred;
@@ -80,6 +81,5 @@ private:
   int barWidth;
   float progress;
   float progressTicks;
-   
-  //...
 };
+#endif
