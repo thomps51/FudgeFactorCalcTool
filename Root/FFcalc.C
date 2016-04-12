@@ -1,7 +1,4 @@
 #include "include/FFcalc.h"
-#include "include/Config.h"
-#include "include/progress_bar.h"
-#include <cfloat>
 
 FFcalc::FFcalc(vector<vector<vector<TH1 *> > > &data_PDFs ,vector<vector<vector<TH1 *> > > &mc_PDFs, string convSt)
 {
@@ -15,12 +12,14 @@ FFcalc::FFcalc(vector<vector<vector<TH1 *> > > &data_PDFs ,vector<vector<vector<
 }
 FFcalc::FFcalc(string data_PDFs_filename ,string mc_PDFs_filename, string convSt)
 {
+  cout << "FFCalc:: getting data PDFs from file " << data_PDFs_filename << endl;
   convStatus = convSt;
   if (convSt != "u" && convSt != "c")
   {
     cerr << "FFcalc::convStatus not set to c or u, please check arguments!" << endl;
   }
   dataPDFs = getPDFsFromFile(data_PDFs_filename);
+  cout << "FFCalc:: getting mc PDFs from file " << mc_PDFs_filename << endl;
   mcPDFs = getPDFsFromFile(mc_PDFs_filename);
 }
 vector<vector<vector<TH1 *> > > FFcalc::getPDFsFromFile(string filename)
@@ -83,8 +82,8 @@ float FFcalc::GetFFerror(TH1F * chiSqHisto, int shift_min)
 }
 FudgeFactor FFcalc::GetFF(TH1 * dataHist, TH1 * mcHist, int var, int etBin, int etaBin)
 {
-  int shift_min = -120;
-  int shift_max =  120;
+  int shift_min = Config::shift_min;
+  int shift_max = Config::shift_max;
 
   float mcMax    = mcHist->GetXaxis()->GetXmax();
   float mcMin    = mcHist->GetXaxis()->GetXmin();
@@ -154,7 +153,7 @@ void FFcalc::Run()
 }
 void FFcalc::writePlotsToFile()
 {
-  string filename = "output/outFile_FF_" + convStatus + ".root";
+  string filename = Config::FFsOutputDir+"/outFile_FF_" + convStatus + ".root";
   TFile * f = new TFile(filename.c_str(),"recreate");
   for(int var =0 ; var < Config::Nvars; var++ )
   {
@@ -212,7 +211,7 @@ void FFcalc::writePlotsToFile()
 
 void FFcalc::writeFFsToRootFile()
 {
-  string filename = "output/FF_tool_input_" + convStatus + ".root";
+  string filename = Config::FFsOutputDir+"/FF_tool_input_" + convStatus + ".root";
   TFile * f = new TFile(filename.c_str(),"recreate");
   for(int var =0;var<Config::Nvars;var++)
   {
@@ -234,7 +233,7 @@ void FFcalc::writeFFsToRootFile()
 void FFcalc::writeFFsToPyFile()
 {
   ofstream myfile;
-  string FFsFileName = "output/FudgeFactors_"+convStatus+".py";
+  string FFsFileName = Config::FFsOutputDir+"/FudgeFactors_"+convStatus+".py";
   myfile.open(FFsFileName);
   for(int var =0;var<Config::Nvars;var++)
   {
@@ -256,7 +255,7 @@ void FFcalc::writeFFsToPyFile()
 void FFcalc::writeErrorsToPyFile()
 {
   ofstream myfile;
-  string ErrorFileName = "output/ChiSqErrors_" + convStatus + ".py";
+  string ErrorFileName = Config::FFsOutputDir+"/ChiSqErrors_" + convStatus + ".py";
   myfile.open(ErrorFileName);
   for(int var =0;var<Config::Nvars;var++)
   {
@@ -278,7 +277,7 @@ void FFcalc::writeErrorsToPyFile()
 void FFcalc::writeFFsToCFile()
 {
   ofstream myfile;
-  string FFsFileName = "output/FudgeFactors_" + convStatus + ".C";
+  string FFsFileName = Config::FFsOutputDir+"/FudgeFactors_" + convStatus + ".C";
   myfile.open(FFsFileName);
   for(int var =0;var<Config::Nvars;var++)
   {
@@ -300,9 +299,7 @@ void FFcalc::writeFFsToCFile()
 void FFcalc::writeErrorsToCFile()
 {
   ofstream myfile;
-  string ErrorFileName = "output/ChiSqErrors_";
-  ErrorFileName.append(convStatus);
-  ErrorFileName.append(".C");
+  string ErrorFileName = Config::FFsOutputDir+"/ChiSqErrors_" + convStatus + ".C";
   myfile.open(ErrorFileName);
   for(int var =0;var<Config::Nvars;var++)
   {
