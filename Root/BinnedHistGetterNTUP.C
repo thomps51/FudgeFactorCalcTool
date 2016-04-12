@@ -1,6 +1,4 @@
 #include "include/BinnedHistGetterNTUP.h"
-#include "include/Config.h"
-#include <cmath>
 using namespace std;
 
 
@@ -181,8 +179,12 @@ for(int var = 0; var < Config::Nvars; var++)
         string histNameBase =Config::varsN[var]+"_"+Config::etNames[etBin]+Config::etaNames[etaBin];
         string histName_conv   = histNameBase + "_c";
         string histName_unconv = histNameBase + "_u";
-        VarEtHists_c.push_back(new TH1F(histName_conv.c_str()  ,histName_conv.c_str()  ,Config::Nbins,Config::xmins[var],Config::xmaxs[var])); 
-        VarEtHists_u.push_back(new TH1F(histName_unconv.c_str(),histName_unconv.c_str(),Config::Nbins,Config::xmins[var],Config::xmaxs[var])); 
+        TH1F * hist_c = new TH1F(histName_conv.c_str()  ,histName_conv.c_str()  ,Config::Nbins,Config::xmins[var],Config::xmaxs[var]);
+        hist_c->Sumw2();
+        VarEtHists_c.push_back(hist_c); 
+        TH1F * hist_u = new TH1F(histName_unconv.c_str(),histName_unconv.c_str(),Config::Nbins,Config::xmins[var],Config::xmaxs[var]);
+        hist_u->Sumw2();
+        VarEtHists_u.push_back(hist_u); 
       }
       VarHists_c.push_back(VarEtHists_c);
       VarHists_u.push_back(VarEtHists_u);
@@ -209,7 +211,7 @@ void BinnedHistGetterNTUP::writeHistsToFiles()
   string datatype="";
   if(data) datatype="data";
   else     datatype="mc";
-  string filename = "output/test/hists_" + datatype + "_c"  + ".root";
+  string filename = Config::histOutputDir+"/hists_" + datatype + "_c"  + ".root";
   TFile f(filename.c_str(),"recreate");
   for(int var =0 ; var < Config::Nvars; var++ )
   {
@@ -223,7 +225,7 @@ void BinnedHistGetterNTUP::writeHistsToFiles()
   }
   cout << "conv binned "<< datatype << " hists written to file: " << filename << endl;
   f.Close();
-  filename = "output/test/hists_" + datatype + "_u"  + ".root";
+  filename = Config::histOutputDir+"/hists_" + datatype + "_u"  + ".root";
   TFile g(filename.c_str(),"recreate");
   for(int var =0 ; var < Config::Nvars; var++ )
   {
