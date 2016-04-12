@@ -1,6 +1,4 @@
 #include "include/BinnedHistGetter.h"
-#include "include/Config.h"
-#include "include/progress_bar.h"
 using namespace std;
 
 
@@ -38,8 +36,6 @@ void BinnedHistGetter::init(){
   ttree->SetBranchAddress("ph_phi", &ph_phi);
   ttree->SetBranchAddress("ph_weight", &ph_weight);
   ttree->SetBranchAddress("ph_pt", &ph_pt);
-
-
 }
 void BinnedHistGetter::makeHistos(){
 for(int var = 0; var < Config::Nvars; var++)
@@ -51,7 +47,9 @@ for(int var = 0; var < Config::Nvars; var++)
       for(int etaBin=0; etaBin<Config::NetaBins;etaBin++)
       {
         string histName = Config::varsN[var]+"_"+ Config::etNames[etBin] + Config::etaNames[etaBin] + "_" + convStatus ;
-        VarEtHists.push_back(new TH1F(histName.c_str(),histName.c_str(),Config::Nbins,Config::xmins[var],Config::xmaxs[var])); 
+        TH1F * hist = new TH1F(histName.c_str(),histName.c_str(),Config::Nbins,Config::xmins[var],Config::xmaxs[var]);
+        hist->Sumw2();
+        VarEtHists.push_back(hist); 
       }
       VarHists.push_back(VarEtHists);
     }
@@ -90,7 +88,7 @@ void BinnedHistGetter::LoopOverFile(){
 }
 void BinnedHistGetter::writeHistsToFile()
 {
-  string filename = "output/hists/hists_" + dataType + "_"+convStatus  + ".root";
+  string filename = Config::histOutputDir+"/hists_" + dataType + "_"+convStatus  + ".root";
   TFile f(filename.c_str(),"recreate");
   for(int var =0 ; var < Config::Nvars; var++ )
   {
