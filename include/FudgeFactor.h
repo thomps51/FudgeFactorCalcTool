@@ -11,17 +11,17 @@ class FudgeFactor
     FudgeFactor(TH1F * Chiplot, TH1 * data_hist, TH1 * mc_hist, int bin_shift, float val, float err): 
       chisqPlot(Chiplot),dataHist(data_hist),mcHist(mc_hist), shift(bin_shift), value(val), error(err) {}
    
-    double GetValue() { return value;  }
-    double GetError() { return error;  }
+    double GetValue()     { return value;  }
+    double GetError()     { return error;  }
     TH1F * GetChiSqPlot() { return chisqPlot; }
-    TH1 * GetDataPDF(){ return dataHist; }
-    TH1 * GetMCPDF()  { return mcHist;   }
-    int   GetShift()  { return shift;    } 
+    TH1  * GetDataPDF()   { return dataHist; }
+    TH1  * GetMCPDF()     { return mcHist;   }
+    int    GetShift()     { return shift;    } 
 
     TH1F * chisqPlot;
-    TH1 * dataHist;
-    TH1 * mcHist;
-    int shift;
+    TH1  * dataHist;
+    TH1  * mcHist;
+    int    shift;
     double value;
     double error;
 

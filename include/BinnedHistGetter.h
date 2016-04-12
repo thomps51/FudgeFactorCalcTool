@@ -4,7 +4,8 @@
 #include "TTree.h"
 #include <vector>
 #include "TH1F.h"
-//#include "globalVars.h"
+#include "include/Config.h"
+#include "include/progress_bar.h"
 
 using namespace std;
 
@@ -43,15 +44,5 @@ class BinnedHistGetter
     vector<float> * ph_pt;
     vector<float> * ph_eta;
     vector<float> *ph_phi;
-    //vector<float> *ph_reta;
-    //vector<float> *ph_rphi;
-    //vector<float> *ph_weta2;
-    //vector<float> *ph_w1;
-    //vector<float> *ph_wstot;
-    //vector<float> *ph_fside;
-    //vector<float> *ph_rhad;
-    //vector<float> *ph_rhad1;
     vector<float> *ph_weight;
-
-
 };

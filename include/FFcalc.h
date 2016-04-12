@@ -10,6 +10,9 @@
 #include "TCanvas.h"
 #include "include/FudgeFactor.h"
 #include "TF1.h"
+#include "include/Config.h"
+#include "include/progress_bar.h"
+#include <cfloat>
 using namespace std;
 
 class FFcalc

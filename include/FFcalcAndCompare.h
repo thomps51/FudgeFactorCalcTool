@@ -41,6 +41,3 @@ class FFcalcAndCompare
     void writeFFsCompareToRootFile(); 
     string convStatus;
 };
-
-
-

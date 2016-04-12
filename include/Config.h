@@ -1,34 +1,43 @@
+#ifndef CONFIG_H
+#define CONFIG_H
 #include <string>
-
+using namespace std;
 class Config{
   public:
-    static std::string inputDumpedNTUPpathData    ;    
-    static std::string inputDumpedNTUPpathMC      ;   
-    static bool use_noFF_vars;
-    static std::string inputPskimmedPathDataConv  ;  
-    static std::string inputPskimmedPathDataUnconv;
-    static std::string inputPskimmedPathMCconv    ;
-    static std::string inputPskimmedPathMCunconv  ;
-    static int NvarsInputPskim;
-    static std::string InputVarsPskim [];
+// INPUT TYPE 1: NTUPLES from egammaAODtoNtupleDumper
+    static string inputDumpedNTUPpathData    ;    
+    static string inputDumpedNTUPpathMC      ;   
+    static bool   use_noFF_vars;
+    static int    NvarsInputNTUP;
+    static string InputVarsNTUP [];
+    static string InputVarsNoFFNTUP [];
 
+// INPUT TYPE 2: "Pskimmed files"
+    static string inputPskimmedPathDataConv  ;  
+    static string inputPskimmedPathDataUnconv;
+    static string inputPskimmedPathMCconv    ;
+    static string inputPskimmedPathMCunconv  ;
+    static string InputVarsPskim [];
+    static int    NvarsInputPskim;
 
-    static int NvarsInputNTUP;
-    static std::string InputVarsNTUP [];
-    static std::string InputVarsNoFFNTUP [];
-
-    static float KDEFineFactors [];
-    static int NetBins;
-    static int NetaBins;
-    static int Nvars;
-    static std::string etNames[];
-    static std::string etaNames[];
-    static std::string varsN[];
-    static std::string  InputVars[];
-    static float xmins[];
-    static float xmaxs[];
-    static int Nbins;
-    static int etBins[];
-    static float etaBins[];
+    // Variables for running
+    static int    Nbins;
+    static int    shift_max;
+    static int    shift_min;
+    static string FFsOutputDir;
+    static string histOutputDir;
+    static string pdfsOutputDir;
+    static string varsN[];
+    static float  xmins[];
+    static float  xmaxs[];
+    static float  KDEFineFactors [];
+    static string etNames[];
+    static string etaNames[];
+    static int    etBins[];
+    static float  etaBins[];
+    static int    NetBins;
+    static int    NetaBins;
+    static int    Nvars;
 
 };
+#endif
