@@ -1,10 +1,4 @@
-#include "include/Config.h"
 #include "include/PDFgetter.h"
-#include "TMVA/PDF.h"
-#include <thread>
-#include <unistd.h>
-#include <ctime>
-#include "include/progress_bar.h"
 
 PDFgetter::PDFgetter(vector<vector<vector<TH1F *> > > &Hists, string convSt, string data_type)
 {
@@ -22,9 +16,18 @@ PDFgetter::PDFgetter(vector<vector<vector<TH1F *> > > &Hists, string convSt, str
 }
 PDFgetter::PDFgetter(string inputfilename, string convSt, string data_type)
 {
+  cout << "PDFgetter:: getting hists from file " << inputfilename << endl;
   convStatus = convSt;
-  hists=getHistsFromFile(inputfilename);
+  if (convSt != "u" && convSt != "c")
+  {
+    cerr << "PDFgetter::convStatus not set to c or u, please check arguments!" << endl;
+  }
   datatype   = data_type;
+  if (datatype != "data" && datatype != "mc")
+  {
+    cerr << "PDFgetter::datatype not set to data or mc, please check arguments!" << endl;
+  }
+  hists=getHistsFromFile(inputfilename);
 }
 
 vector<vector<vector<TH1F *> > > PDFgetter::getHistsFromFile(string filename)
@@ -92,7 +95,6 @@ vector<vector<vector<TH1 *> > > PDFgetter::makeSmoothedPDFs()
               KDEsmoothed->Scale(SF);
               VarEtPDFs[etaBin] = KDEsmoothed;
           }
-          //VarPDFs.push_back(VarEtPDFs);
           VarPDFs[etBin]=VarEtPDFs;
           bar.tick();
         }
@@ -162,7 +164,7 @@ streambuf *old = cout.rdbuf();
 void PDFgetter::writeToFile()
 {
      
-    string filename = "output/pdfs/pdfs_" + datatype + "_" + convStatus + ".root";
+    string filename = Config::pdfsOutputDir+"/pdfs_" + datatype + "_" + convStatus + ".root";
     TFile f(filename.c_str(),"recreate");
     for(int var =0 ; var < Config::Nvars; var++ )
     {
@@ -178,19 +180,5 @@ void PDFgetter::writeToFile()
     if (convStatus == "u") convName="unconv";
     else                   convName="conv";
     cout << convName  << " " << datatype <<" PDFs file written to " << filename << endl;
-    filename = "output/hists/hists_" + datatype + "_" + convStatus + ".root";
-    TFile g(filename.c_str(),"recreate");
-    for(int var =0 ; var < Config::Nvars; var++ )
-    {
-        for(int etBin =0; etBin < Config::NetBins ; etBin++)
-        {
-            for(int etaBin = 0; etaBin < Config::NetaBins;etaBin++ )
-            {
-                hists[var][etBin][etaBin]->Write();
-            }
-        }
-    }
-   
-
 }
 
