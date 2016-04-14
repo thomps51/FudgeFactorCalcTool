@@ -39,10 +39,10 @@ class BinnedHistGetter
     TTree *ttree;
 
     vector<vector<vector<TH1F * > > > hists;  // 3d vector in form [var][etBin][etaBin]
-    map<string,vector<float> * > inputVars;
+    map<string,float > inputVars;
 
-    vector<float> * ph_pt;
-    vector<float> * ph_eta;
-    vector<float> *ph_phi;
-    vector<float> *ph_weight;
+    float  ph_pt;
+    float  ph_eta;
+    float ph_phi;
+    float ph_weight;
 };
