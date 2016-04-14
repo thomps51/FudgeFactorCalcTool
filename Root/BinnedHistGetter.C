@@ -1,7 +1,6 @@
 #include "include/BinnedHistGetter.h"
 using namespace std;
 
-
 BinnedHistGetter::BinnedHistGetter(string inputFile,string convSt, string data_type){
   f = TFile::Open(inputFile.c_str());
   inputFileName=f->GetName();
@@ -68,15 +67,15 @@ void BinnedHistGetter::LoopOverFile(){
       for(int j=0;j<Config::NetaBins;j++)
       {
 
-        if( fabs(ph_eta->at(0)) > Config::etaBins[j] && fabs(ph_eta->at(0)) < Config::etaBins[j+1] && ph_pt->at(0)/1000 > Config::etBins[i] && ph_pt->at(0)/1000 < Config::etBins[i+1])
+        if( fabs(ph_eta) > Config::etaBins[j] && fabs(ph_eta) < Config::etaBins[j+1] && ph_pt/1000 > Config::etBins[i] && ph_pt/1000 < Config::etBins[i+1])
         {
           float weight = 1;
-          if (dataType=="mc") weight = ph_weight->at(0);
+          if (dataType=="mc") weight = ph_weight;
           
           for(int var = 0; var< Config::Nvars ; var++)
           {
             string inputvarname = Config::InputVarsPskim[var] ;
-            float value         = inputVars[inputvarname]->at(0);
+            float value         = inputVars[inputvarname];
             hists[var][i][j]->Fill(value, weight);
           }
         }
@@ -88,7 +87,17 @@ void BinnedHistGetter::LoopOverFile(){
 }
 void BinnedHistGetter::writeHistsToFile()
 {
-  string filename = Config::histOutputDir+"/hists_" + dataType + "_"+convStatus  + ".root";
+  string filename = "";
+  if (dataType == "data")
+  {
+    if(convStatus == "c") filename=Config::histOutputDir+"/"+Config::histDataConvFile;
+    else                  filename=Config::histOutputDir+"/"+Config::histDataUnconvFile;
+  }
+  else
+  {
+    if(convStatus == "c") filename=Config::histOutputDir+"/"+Config::histMCconvFile;
+    else                  filename=Config::histOutputDir+"/"+Config::histMCunconvFile;
+  }
   TFile f(filename.c_str(),"recreate");
   for(int var =0 ; var < Config::Nvars; var++ )
   {
@@ -100,6 +109,9 @@ void BinnedHistGetter::writeHistsToFile()
           }
       }
   }
-  cout << convStatus << " binned "<< dataType << " hists written to file: " << filename << endl;
+  string convName = "";
+  if (convStatus == "u") convName="unconv";
+  else                   convName="conv";
+  cout << convName << " " << dataType<< " binned hists written to file: " << filename << endl;
   f.Close();
 }
