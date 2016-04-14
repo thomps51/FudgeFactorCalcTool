@@ -1,14 +1,43 @@
-This program will take the output from pskim, bin the variables into eta and et, 
+This program is used for calculating Fudge Factors, which are shifts for simulated Monte Carlo 
+data variable distributions to better match actual data.  Fudge Factors are a bit of a hack, 
+but they are the best thing we can do, short of 100% perfect detector modeling.
+
+
+This program will take an NTUPLE with photons, bin the variables into eta and et, 
 and then calculate the fudge factors with errors.
 
+
+
+
 PUT YOUR INPUT FILES IN Config.C!!!!!
+Fill out INPUT FILES in Config.C, and set the variables for running.
 
-You need to put the source files in the main.C file
-Configuration options are in Config.C
+INPUT: NTUPLES from egammaAODtoNtupleDumper:
+svn+ssh://svn.cern.ch/reps/atlasperf/CombPerf/EGamma/PhotonID/egammaAODtoNtupleDumper/
+run over these files using the following commands:
 
-Run like:
-source setup.sh   # mainly to use root libs and c++11
-make              # make sure it is compiled
-./getFFsFromPskim # run the command
+
+SIMPLE USAGE FOR PHOTON FUDGE FACTORS:
+# EDIT CONFIG AND ADD YOUR FILES TO INPUT 1
+source setup.sh          # sets up root, output directories
+make                     # makes the executables
+./getSkimFromNTUP        # takes the input NTUP and makes Skimmed, Cut, Conv/Unconv samples
+./getBinnedHistsFromSkim # takes skim file and bins in et/eta   |\
+./getPDFsFromBinnedHists # makes PDFs from the binned files     | can do all three of these with ./getFFsFromSkim
+./getFFsFromPDFs         # makes FFs from the PDFs              |/
+
+The default output folder (can be changed in Config.C) is output/ , which has
+the following folders by default:
+skimmedNtups/  - contains the output of getSkimFromNTUP, which is also used as input to getBinnedHistsFromSkim.
+  Contains skimmed ntups for data/mc conv/unconv.
+hists/         - contains the output of getBinnedHistsFromSkim, which is also used as input to getPDFsFromBinnedHists.
+  Contains binned histograms (in Et & Eta) for each of the skimmedNtups.
+pdfs/          - contains the output of getPDFsFromBinnedHists, which is also used as input to getFFsFromPDFs
+  Contains pdfs for all of the variables specified in Config.C
+FudgeFactors/  - contains the output of getFFsFromPDFs.  This includes the following files:
+  FudgeFactors_* .py and .C : the calculated fudge factor values, in the form variable[etBin][etaBin]
+  ChiSqErrors*   .py and .C : the statistical error in the fudge factor values
+  FF_tool_input*            : the input for the soon-to-be announced tool to replace FudgeMCTool for fudge factors
+  outFile_FF*               : root file with plots of the chi-sq shifts and plots showing the effect of the shifts
 
 
