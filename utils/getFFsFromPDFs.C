@@ -5,9 +5,13 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-  FFcalc * FFobj_c = new FFcalc("output/pdfs/pdfs_data_c.root","output/pdfs/pdfs_mc_c.root","c");
+  string pdfs_data_c = Config::pdfsOutputDir+"/"+Config::pdfsDataConvFile;
+  string pdfs_mc_c   = Config::pdfsOutputDir+"/"+ Config::pdfsMCconvFile;
+  FFcalc * FFobj_c = new FFcalc(pdfs_data_c,pdfs_mc_c,"c");
   FFobj_c->Run();
 
-  FFcalc * FFobj_u = new FFcalc("output/pdfs/pdfs_data_u.root","output/pdfs/pdfs_mc_u.root","u");
+  string pdfs_data_u = Config::pdfsOutputDir+"/"+Config::pdfsDataUnconvFile;
+  string pdfs_mc_u   = Config::pdfsOutputDir+"/"+ Config::pdfsMCunconvFile;
+  FFcalc * FFobj_u = new FFcalc(pdfs_data_u,pdfs_mc_u,"u");
   FFobj_u->Run();
 }
