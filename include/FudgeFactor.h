@@ -1,4 +1,3 @@
-
 #include "TH1F.h"
 #include "TH1.h"
 
@@ -24,5 +23,4 @@ class FudgeFactor
     int    shift;
     double value;
     double error;
-
 };
