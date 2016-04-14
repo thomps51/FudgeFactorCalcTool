@@ -1,18 +1,29 @@
-
+# Slowly getting better at making makefiles... This is still terrible
 ROOTCFLAGS := $(shell root-config --cflags)
-ROOTLIBS := $(shell root-config --libs) -lMinuit -lEG -lTMVA 
+ROOTLIBS := $(shell root-config --libs) -lMinuit -lEG -lTMVA  
 CXX = g++
 
-CXXFLAGS  = -I. -I$(ROOTSYS)/include -O -Wall -fopenmp -fPIC -Wno-reorder -g  
+CXXFLAGS  = -I. -I$(ROOTSYS)/include -O -Wall -fopenmp -fPIC -Wno-reorder -g
 CXXFLAGS += $(ROOTCFLAGS)
 LIBS    = $(ROOTLIBS) 
 
-OBJS = libs/Config.o libs/BinnedHistGetter.o libs/BinnedHistGetterNTUP.o libs/PDFgetter.o libs/FFcalc.o 
-DEPS = include/Config.h include/progress_bar.h include/BinnedHistGetter.h include/BinnedHistGetterNTUP.h include/PDFgetter.h include/FFcalc.h utils/getFFsFromPskim.C utils/getFFsFromPDFs.C utils/test.C utils/getFFsFromNTUP.C utils/getBinnedHistsFromNTUP.C
+OBJS = libs/Config.o
+DEPS = include/Config.h include/progress_bar.h
 
+getSkimFromNTUP_DEPS        = include/NTUPskimmer.h utils/getSkimFromNTUP.C
+getBinnedHistsFromSkim_DEPS = include/BinnedHistGetter.h utils/getBinnedHistsFromSkim.C
+getPDFsFromBinnedHists_DEPS = include/PDFgetter.h utils/getPDFsFromBinnedHists.C
+getFFsFromPDFs_DEPS         = include/FFcalc.h utils/getFFsFromPDFs.C
+getFFsFromSkim_DEPS         = $(getBinnedHistsFromSkim_DEPS) $(getPDFsFromBinnedHists_DEPS) $(getFFsFromPDFs_DEPS)
 
-all: getFFsFromPskim getFFsFromPDFs test getFFsFromNTUP getBinnedHistsFromNTUP getFFsFromBinnedHists
- 
+getSkimFromNTUP_OBJS        = libs/NTUPskimmer.o 
+getBinnedHistsFromSkim_OBJS = libs/BinnedHistGetter.o
+getPDFsFromBinnedHists_OBJS = libs/PDFgetter.o
+getFFsFromPDFs_OBJS         = libs/FFcalc.o
+getFFsFromSkim_OBJS         = $(getBinnedHistsFromSkim_OBJS) $(getPDFsFromBinnedHists_OBJS) $(getFFsFromPDFs_OBJS)
+
+all: getSkimFromNTUP getBinnedHistsFromSkim getPDFsFromBinnedHists getFFsFromPDFs getFFsFromSkim
+
 
 %.o: %.C $(DEPS)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
@@ -23,33 +34,32 @@ all: getFFsFromPskim getFFsFromPDFs test getFFsFromNTUP getBinnedHistsFromNTUP g
 
 libs/Config.o: Config.C $(DEPS)
 		$(CXX) -c -o $@ $< $(CXXFLAGS) $(ROOTCORE_INCL)
-libs/PDFgetter.o: Root/PDFgetter.C $(DEPS)
+libs/PDFgetter.o: Root/PDFgetter.C $(DEPS) libs/Config.o include/PDFgetter.h 
+		$(CXX) -c -o $@ $< $(CXXFLAGS) $(ROOTCORE_INCL)
+libs/NTUPskimmer.o: Root/NTUPskimmer.C $(DEPS) libs/Config.o include/NTUPskimmer.h
+		$(CXX) -c -o $@ $< $(CXXFLAGS) $(ROOTCORE_INCL)
+libs/FFcalc.o: Root/FFcalc.C $(DEPS) libs/Config.o include/FFcalc.h include/FudgeFactor.h
+		$(CXX) -c -o $@ $< $(CXXFLAGS) $(ROOTCORE_INCL)
+libs/FFcalcAndCompare.o: Root/FFcalcAndCompare.C include/Config.h include/FFcalcAndCompare.h
+		$(CXX) -c -o $@ $< $(CXXFLAGS) $(ROOTCORE_INCL)
+libs/BinnedHistGetter.o: Root/BinnedHistGetter.C $(DEPS) libs/Config.o include/BinnedHistGetter.h
 		$(CXX) -c -o $@ $< $(CXXFLAGS) $(ROOTCORE_INCL)
 
-libs/FFcalc.o: Root/FFcalc.C $(DEPS)
-		$(CXX) -c -o $@ $< $(CXXFLAGS) $(ROOTCORE_INCL)
-libs/FFcalcAndCompare.o: Root/FFcalcAndCompare.C include/Config.h 
-		$(CXX) -c -o $@ $< $(CXXFLAGS) $(ROOTCORE_INCL)
-
-libs/BinnedHistGetter.o: Root/BinnedHistGetter.C $(DEPS)
-		$(CXX) -c -o $@ $< $(CXXFLAGS) $(ROOTCORE_INCL)
-libs/BinnedHistGetterNTUP.o: Root/BinnedHistGetterNTUP.C $(DEPS)
-		$(CXX) -c -o $@ $< $(CXXFLAGS) $(ROOTCORE_INCL)
-getFFsFromPskim: $(OBJS)
-	$(CXX) -o $@ $(OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getFFsFromPskim.C 
-getFFsFromBinnedHists: $(OBJS)
-	$(CXX) -o $@ $(OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getFFsFromBinnedHists.C 
-getFFsFromNTUP: $(OBJS)
-	$(CXX) -o $@ $(OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getFFsFromNTUP.C 
-getFFsFromPDFs: $(OBJS)
-	$(CXX) -o $@ $(OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getFFsFromPDFs.C 
-getBinnedHistsFromNTUP: $(OBJS)
-	$(CXX) -o $@ $(OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getBinnedHistsFromNTUP.C 
-test: $(OBJS)
-	$(CXX) -o $@ $(OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/test.C 
-compare: libs/FFcalcAndCompare.o libs/Config.o
-	$(CXX) -o $@ libs/FFcalcAndCompare.o libs/Config.o $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/compare.C 
-
+getSkimFromNTUP: $(OBJS) $(getSkimFromNTUP_OBJS) $(DEPS) $(getSkimFromNTUP_DEPS)
+	if [ -a getSkimFromNTUP ]; then rm getSkimFromNTUP ; fi; # avoids "undefined" behavior if it is already running
+	$(CXX) -o $@ $(OBJS) $(getSkimFromNTUP_OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getSkimFromNTUP.C
+getBinnedHistsFromSkim: $(OBJS) $(getBinnedHistsFromSkim_OBJS) $(DEPS) $(getBinnedHistsFromSkim_DEPS)
+	if [ -a getBinnedHistsFromSkim ]; then rm getBinnedHistsFromSkim ; fi;	
+	$(CXX) -o $@ $(OBJS) $(getBinnedHistsFromSkim_OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getBinnedHistsFromSkim.C 
+getPDFsFromBinnedHists: $(OBJS) $(getPDFsFromBinnedHists_OBJS) $(DEPS) $(getPDFsFromBinnedHists_DEPS)
+	if [ -a getPDFsFromBinnedHists ]; then rm getPDFsFromBinnedHists ; fi;
+	$(CXX) -o $@ $(OBJS) $(getPDFsFromBinnedHists_OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getPDFsFromBinnedHists.C 
+getFFsFromPDFs: $(OBJS) $(getFFsFromPDFs_OBJS) $(DEPS) $(getFFsFromPDFs_DEPS)
+	if [ -a getFFsFromPDFs ]; then rm getFFsFromPDFs ; fi;
+	$(CXX) -o $@ $(OBJS) $(getFFsFromPDFs_OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getFFsFromPDFs.C 
+getFFsFromSkim: $(OBJS) $(getFFsFromSkim_OBJS) $(DEPS) $(getFFsFromSkim_DEPS)
+	if [ -a getFFsFromPDFs ]; then rm getFFsFromPDFs ; fi;
+	$(CXX) -o $@ $(OBJS) $(getFFsFromSkim_OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getFFsFromSkim.C 
 
 
 # suffix rule
@@ -58,7 +68,7 @@ compare: libs/FFcalcAndCompare.o libs/Config.o
 
 # clean
 clean:
-	rm -f pskim *~ *.o *.o~ *.so core
+	rm getSkimFromNTUP getBinnedHistsFromSkim getPDFsFromBinnedHists getFFsFromPDFs libs/*.o 
 
 
 
