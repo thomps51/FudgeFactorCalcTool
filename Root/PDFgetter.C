@@ -173,6 +173,7 @@ vector<vector<vector<TH1 *> > > PDFgetter::makeSmoothedPDFsParallel()
 
 void PDFgetter::writeToFile()
 {
+    Config::mkpath(Config::pdfsOutputDir,0775);
     string filename = Config::pdfsOutputDir;
     if (datatype == "data")
     {

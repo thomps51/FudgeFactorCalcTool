@@ -87,6 +87,7 @@ void BinnedHistGetter::LoopOverFile(){
 }
 void BinnedHistGetter::writeHistsToFile()
 {
+  Config::mkpath(Config::histOutputDir, 0775);
   string filename = "";
   if (dataType == "data")
   {

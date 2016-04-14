@@ -144,6 +144,7 @@ void FFcalc::GetFFs()
 void FFcalc::Run()
 {
   GetFFs();
+  Config::mkpath(Config::FFsOutputDir,0775); 
   writeFFsToPyFile();
   writeErrorsToPyFile();
   writeFFsToCFile();
