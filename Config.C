@@ -1,6 +1,7 @@
 #include "include/Config.h"
+// MUST RE-MAKE AFTER CHANGING!!!!!!!!!
 
-// INPUT TYPE 1: NTUPLES from egammaAODtoNtupleDumper, use by running ./getBinnedHistsFromNTUP, then ./getFFsFromBinnedHists
+// INPUT: NTUPLES from egammaAODtoNtupleDumper, use by running ./getBinnedHistsFromNTUP, then ./getFFsFromBinnedHists
 // DumpedNTUPs are from the egammaAODtoNtupleDumper, take a look at Root/BinnedHistGetterNTUP.C Cut() function to change cuts
 string Config::inputDumpedNTUPpathData = "/disk/userdata00/user/athomps/FFnewDump/rawFiles/full2015PhotonData.root"; 
 string Config::inputDumpedNTUPpathMC   = "/disk/userdata00/atlas_data2/mistryk/photonid/raw/25ns/mc15b/gamjet.root";
@@ -8,27 +9,42 @@ bool   Config::use_noFF_vars           = true;  // choose whether to use noFF va
 string Config::InputVarsNTUP[]         = {"ph_reta"     ,"ph_rphi"     ,"ph_weta2"     ,"ph_w1"     ,"ph_wstot"     ,"ph_fside"     ,"ph_rhad"     ,"ph_rhad1"     }; 
 string Config::InputVarsNoFFNTUP[]     = {"ph_noFF_reta","ph_noFF_rphi","ph_noFF_weta2","ph_noFF_w1","ph_noFF_wstot","ph_noFF_fside","ph_noFF_rhad","ph_noFF_rhad1"}; 
 int    Config::NvarsInputNTUP          = sizeof(InputVarsNTUP) /sizeof(*InputVarsNTUP);
-// NOTE: ph_rhad and ph_rhad1 are hard-coded to be combined in BinnedHistGetterNTUP.C
+// NOTE: ph_rhad and ph_rhad1 are hard-coded to be combined in BinnedHistGetterNTUP.C (if they are in the list)
 
-// INPUT TYPE 2: "Pskimmed files", which are pre-cut, conv/unconv selected, nutples with vectors of length 1.  Use by running ./getFFsFromPskim
-// Pskimmed files are pre-cut, pre- conv/unconv selected, ntuples with vectors of length 1.  Holdover from old pskim method used for egammacore 
-string Config::inputPskimmedPathDataConv   = "/disk/userdata00/atlas_data2/mistryk/photonid/tonytest/data_looseiso_tightid_conv.root";
-string Config::inputPskimmedPathDataUnconv = "/disk/userdata00/atlas_data2/mistryk/photonid/tonytest/data_looseiso_tightid_unconv.root";
-string Config::inputPskimmedPathMCconv     = "/disk/userdata00/atlas_data2/mistryk/photonid/tonytest/mc_looseiso_tightId_conv.root";
-string Config::inputPskimmedPathMCunconv   = "/disk/userdata00/atlas_data2/mistryk/photonid/tonytest/mc_looseiso_tightId_unconv.root";
+// The Following are used to make the skimmed files and later to make the binned histograms
 string Config::InputVarsPskim[]            = {"ph_reta" ,"ph_rphi" ,"ph_weta2" ,"ph_w1" ,"ph_wstot" ,"ph_fside" ,"ph_rhad" };
 int    Config::NvarsInputPskim             = sizeof(InputVarsPskim) /sizeof(*InputVarsPskim);
-// NOTE: ph_rhad and ph_rhad1 are assumed to be properly combined in pskimmed files, so there is no rhad1 input currently
 
-// SET THE FOLLOWING BEFORE RUNNING.  These are needed regardless of input file type
+
+// SET THE FOLLOWING BEFORE RUNNING
 int    Config::Nbins            = 500;             // number of bins for binned histograms and pdfs
-int    Config::shift_min        = -60;             // max number of bins to shift to the left during chi-sq calculation of FFs
+int    Config::shift_min        = -60;             // max number of bins to shift to the left during chi-sq calculation of FFs, affects running time
 int    Config::shift_max        =  60;             // max number of bins to shift to the right during chi-sq calculation of FFs
-string Config::histOutputDir    = "output/hists";  // make sure this folder is created before running, can also change in setup.sh to make sure of this
-string Config::pdfsOutputDir    = "output/pdfs" ;  // make sure this folder is created before running
-string Config::FFsOutputDir     = "output"      ;
 
-string Config::varsN[]          = {"reta" ,"rphi" ,"weta2" ,"w1" ,"wstot" ,"fside" ,"rhad" };  // what you want your output variables to be named.  Use same order as input!!!
+// the following files are made in getSkimFromNTUP and used in getBinnedHistsFromSkim
+string Config::skimOutputDir      = "output/skimmedNtups";
+string Config::skimMCconvFile     = "mc_c.root";  // will be inside of the above folder
+string Config::skimMCunconvFile   = "mc_u.root";
+string Config::skimDataConvFile   = "data_c.root";
+string Config::skimDataUnconvFile = "data_u.root";
+
+// the following files are made in getBinnedHistsFromSkim and used in getPDFsFromBinnedHists
+string Config::histOutputDir      = "output/hists";  // make sure this folder is created before running, can also change in setup.sh to make sure of this
+string Config::histMCconvFile     = "hists_mc_c.root";
+string Config::histMCunconvFile   = "hists_mc_u.root";
+string Config::histDataConvFile   = "hists_data_c.root";
+string Config::histDataUnconvFile = "hists_data_u.root";
+
+// the following files are made in getPDFsFromBinnedHists and used in getFFsFromPDFs
+string Config::pdfsOutputDir      = "output/pdfs" ;  // make sure this folder is created before running
+string Config::pdfsMCconvFile     = "pdfs_mc_c.root";
+string Config::pdfsMCunconvFile   = "pdfs_mc_u.root";
+string Config::pdfsDataConvFile   = "pdfs_data_c.root";
+string Config::pdfsDataUnconvFile = "pdfs_data_u.root";
+
+string Config::FFsOutputDir       = "output/FudgeFactors"      ;
+
+string Config::varsN[]          = {"reta" ,"rphi" ,"weta2" ,"w1" ,"wstot" ,"fside" ,"rhad" };  // what you want your output variables to be named.  Use same order as InputVarsPskim!!!
 float  Config::xmins[]          = {0.85   ,0.5    ,0.006   ,0.4  ,0.25    ,-0.1    ,-0.04  };  // xmins for binned hists and pdfs, KEEP ORDER 
 float  Config::xmaxs[]          = {1.15   ,1.05   ,0.014   ,0.9  ,4.0     , 0.9    , 0.04  };  // xmaxs for binned hists and pdfs, KEEP ORDER
 float  Config::KDEFineFactors[] = {1.5    ,3      ,15      ,2    ,0.6     , 1.2    , 2     };  // fine factors for KDE smoothing of PDFs, KEEP ORDER
