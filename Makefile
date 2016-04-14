@@ -58,7 +58,7 @@ getFFsFromPDFs: $(OBJS) $(getFFsFromPDFs_OBJS) $(DEPS) $(getFFsFromPDFs_DEPS)
 	if [ -a getFFsFromPDFs ]; then rm getFFsFromPDFs ; fi;
 	$(CXX) -o $@ $(OBJS) $(getFFsFromPDFs_OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getFFsFromPDFs.C 
 getFFsFromSkim: $(OBJS) $(getFFsFromSkim_OBJS) $(DEPS) $(getFFsFromSkim_DEPS)
-	if [ -a getFFsFromPDFs ]; then rm getFFsFromPDFs ; fi;
+	if [ -a getFFsFromSkim ]; then rm getFFsFromSkim ; fi;
 	$(CXX) -o $@ $(OBJS) $(getFFsFromSkim_OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getFFsFromSkim.C 
 
 
