@@ -9,7 +9,7 @@ bool   Config::use_noFF_vars           = true;  // choose whether to use noFF va
 string Config::InputVarsNTUP[]         = {"ph_reta"     ,"ph_rphi"     ,"ph_weta2"     ,"ph_w1"     ,"ph_wstot"     ,"ph_fside"     ,"ph_rhad"     ,"ph_rhad1"     }; 
 string Config::InputVarsNoFFNTUP[]     = {"ph_noFF_reta","ph_noFF_rphi","ph_noFF_weta2","ph_noFF_w1","ph_noFF_wstot","ph_noFF_fside","ph_noFF_rhad","ph_noFF_rhad1"}; 
 int    Config::NvarsInputNTUP          = sizeof(InputVarsNTUP) /sizeof(*InputVarsNTUP);
-// NOTE: ph_rhad and ph_rhad1 are hard-coded to be combined in BinnedHistGetterNTUP.C (if they are in the list)
+// NOTE: ph_rhad and ph_rhad1 are hard-coded to be combined in BinnedHistGetterNTUP.C (if they are in the list above)
 
 // The Following are used to make the skimmed files and later to make the binned histograms
 string Config::InputVarsPskim[]            = {"ph_reta" ,"ph_rphi" ,"ph_weta2" ,"ph_w1" ,"ph_wstot" ,"ph_fside" ,"ph_rhad" };
@@ -22,21 +22,21 @@ int    Config::shift_min        = -60;             // max number of bins to shif
 int    Config::shift_max        =  60;             // max number of bins to shift to the right during chi-sq calculation of FFs
 
 // the following files are made in getSkimFromNTUP and used in getBinnedHistsFromSkim
-string Config::skimOutputDir      = "output/skimmedNtups";
+string Config::skimOutputDir      = "output/skimmedNtups"; // folder will be created at runtime if it doesn't exist
 string Config::skimMCconvFile     = "mc_c.root";  // will be inside of the above folder
 string Config::skimMCunconvFile   = "mc_u.root";
 string Config::skimDataConvFile   = "data_c.root";
 string Config::skimDataUnconvFile = "data_u.root";
 
 // the following files are made in getBinnedHistsFromSkim and used in getPDFsFromBinnedHists
-string Config::histOutputDir      = "output/hists";  // make sure this folder is created before running, can also change in setup.sh to make sure of this
+string Config::histOutputDir      = "output/hists";  
 string Config::histMCconvFile     = "hists_mc_c.root";
 string Config::histMCunconvFile   = "hists_mc_u.root";
 string Config::histDataConvFile   = "hists_data_c.root";
 string Config::histDataUnconvFile = "hists_data_u.root";
 
 // the following files are made in getPDFsFromBinnedHists and used in getFFsFromPDFs
-string Config::pdfsOutputDir      = "output/pdfs" ;  // make sure this folder is created before running
+string Config::pdfsOutputDir      = "output/pdfs" ;  
 string Config::pdfsMCconvFile     = "pdfs_mc_c.root";
 string Config::pdfsMCunconvFile   = "pdfs_mc_u.root";
 string Config::pdfsDataConvFile   = "pdfs_data_c.root";
