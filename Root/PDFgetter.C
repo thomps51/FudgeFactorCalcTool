@@ -103,10 +103,14 @@ vector<vector<vector<TH1 *> > > PDFgetter::makeSmoothedPDFs()
     bar.end();
     return pdfs;
 }
+
+/*
+  getPDFsForVar is used in makeSmoothedPDFsParallel, since each variable gets it's own thread
+*/
 void PDFgetter::getPDFsForVar(unsigned var)
 {
   // start with offset
-  usleep(var*100000); // hack for parallel running, the damn TMVA::PDF creation stdouts happening at the same time cause segfaults
+  usleep(var*100000); // hack for parallel running, the damn TMVA::PDF 
 
   vector<vector<TH1 * > > VarPDFs(Config::NetBins);
   float kdeFF = Config::KDEFineFactors[var];
@@ -130,6 +134,10 @@ void PDFgetter::getPDFsForVar(unsigned var)
   pdfs[var]=VarPDFs;
 }
 
+/*
+  makeSmoothedPDFsParallel is a test of making the code faster, but it is unstable because of how TMVA works, and 
+  only works ~90% of the time (and seg faults 10% of the time)
+*/
 vector<vector<vector<TH1 *> > > PDFgetter::makeSmoothedPDFsParallel()
 {
   string convString;
@@ -138,7 +146,7 @@ vector<vector<vector<TH1 *> > > PDFgetter::makeSmoothedPDFsParallel()
   cout << "making smoothed PDFs for " << convString << " "<< datatype << endl;
   pdfs= vector<vector<vector<TH1 *> > >(Config::Nvars);
   
-streambuf *old = cout.rdbuf();
+  streambuf *old = cout.rdbuf();
   time_t rawtime = time(0);
   char timestamp[16];
   struct tm *now = localtime(&rawtime);
@@ -161,10 +169,24 @@ streambuf *old = cout.rdbuf();
   return pdfs; 
     
 }
+
+
 void PDFgetter::writeToFile()
 {
-     
-    string filename = Config::pdfsOutputDir+"/pdfs_" + datatype + "_" + convStatus + ".root";
+    string filename = Config::pdfsOutputDir;
+    if (datatype == "data")
+    {
+      if(convStatus == "c") filename+="/"+Config::pdfsDataConvFile;
+      else                  filename+="/"+Config::pdfsDataUnconvFile;
+    }
+    else
+    {
+      if(convStatus == "c") filename+="/"+Config::pdfsMCconvFile;
+      else                  filename+="/"+Config::pdfsMCunconvFile;
+    } 
+    
+    
+    
     TFile f(filename.c_str(),"recreate");
     for(int var =0 ; var < Config::Nvars; var++ )
     {
@@ -181,4 +203,3 @@ void PDFgetter::writeToFile()
     else                   convName="conv";
     cout << convName  << " " << datatype <<" PDFs file written to " << filename << endl;
 }
-
