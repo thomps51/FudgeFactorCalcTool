@@ -4,7 +4,8 @@ but they are the best thing we can do, short of 100% perfect detector modeling.
 
 
 This program will take an NTUPLE with photons, bin the variables into eta and et, 
-and then calculate the fudge factors with errors.
+and then calculate the fudge factors with errors. The fudge factors are calculated
+using a simple chi-sq approach by shifting the mc pdfs to match the data pdfs.
 
 
 
@@ -22,9 +23,9 @@ SIMPLE USAGE FOR PHOTON FUDGE FACTORS:
 source setup.sh          # sets up root, output directories
 make                     # makes the executables
 ./getSkimFromNTUP        # takes the input NTUP and makes Skimmed, Cut, Conv/Unconv samples
-./getBinnedHistsFromSkim # takes skim file and bins in et/eta   |\
-./getPDFsFromBinnedHists # makes PDFs from the binned files     | can do all three of these with ./getFFsFromSkim
-./getFFsFromPDFs         # makes FFs from the PDFs              |/
+./getBinnedHistsFromSkim # takes skim file and bins in et/eta |\
+./getPDFsFromBinnedHists # makes PDFs from the binned files   | equal to ./getFFsFromSkim
+./getFFsFromPDFs         # makes FFs from the PDFs            |/
 
 The default output folder (can be changed in Config.C) is output/ , which has
 the following folders by default:
@@ -40,4 +41,9 @@ FudgeFactors/  - contains the output of getFFsFromPDFs.  This includes the follo
   FF_tool_input*            : the input for the soon-to-be announced tool to replace FudgeMCTool for fudge factors
   outFile_FF*               : root file with plots of the chi-sq shifts and plots showing the effect of the shifts
 
+
+
+FOR DEVELEPMENT / ADVANCED USAGE:
+
+Change Cuts in the Root/NTUPskimmer.C Cut() function, then recompile.
 

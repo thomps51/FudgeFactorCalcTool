@@ -11,7 +11,7 @@ string Config::InputVarsNoFFNTUP[]     = {"ph_noFF_reta","ph_noFF_rphi","ph_noFF
 int    Config::NvarsInputNTUP          = sizeof(InputVarsNTUP) /sizeof(*InputVarsNTUP);
 // NOTE: ph_rhad and ph_rhad1 are hard-coded to be combined in BinnedHistGetterNTUP.C (if they are in the list above)
 
-// The Following are used to make the skimmed files and later to make the binned histograms
+// The Following are used to make the skimmed files and later to make the binned histograms.  Variables must be in same order as above in NTUP vars!!!!
 string Config::InputVarsPskim[]            = {"ph_reta" ,"ph_rphi" ,"ph_weta2" ,"ph_w1" ,"ph_wstot" ,"ph_fside" ,"ph_rhad" };
 int    Config::NvarsInputPskim             = sizeof(InputVarsPskim) /sizeof(*InputVarsPskim);
 

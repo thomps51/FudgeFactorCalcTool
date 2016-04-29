@@ -3,9 +3,17 @@
 
 
 
+/*
+ * Constructor for NTUPskimmer.  Opens input file for reading, intializes the variables to
+ * be read from the input file and written to the output file.  Creates output files and
+ * TTrees.
+ *
+ * Uses the noFF variables defined in Config.C if passed true for useNoFFvariables
+ */
+
 NTUPskimmer::NTUPskimmer(string inputFile, string inputFileType, bool useNoFFvariables)
 {
-  ntupFile = new TFile(inputFile.c_str());
+  ntupFile = TFile::Open(inputFile.c_str());
   inputFileName=ntupFile->GetName();
   inputType=inputFileType;
   if (inputFileType == "data")  data=true;
@@ -25,18 +33,17 @@ NTUPskimmer::NTUPskimmer(string inputFile, string inputFileType, bool useNoFFvar
  
   Config::mkpath(Config::skimOutputDir,0775);
 
-  string outName = Config::skimOutputDir;
-  string outName_c= "";
-  string outName_u= "";
+  string outName_c= Config::skimOutputDir+"/";
+  string outName_u= Config::skimOutputDir+"/";
   if(data)
   {
-    outName_c = outName+"/"+Config::skimDataConvFile;
-    outName_u = outName+"/"+Config::skimDataUnconvFile;
+    outName_c += Config::skimDataConvFile;
+    outName_u += Config::skimDataUnconvFile;
   }
   else
   {
-    outName_c = outName+"/"+Config::skimMCconvFile;
-    outName_u = outName+"/"+Config::skimMCunconvFile;
+    outName_c += Config::skimMCconvFile;
+    outName_u += Config::skimMCunconvFile;
   }
 
   outputFile_c = TFile::Open(outName_c.c_str(),"recreate"); 
@@ -45,6 +52,15 @@ NTUPskimmer::NTUPskimmer(string inputFile, string inputFileType, bool useNoFFvar
   outputFile_u = TFile::Open(outName_u.c_str(),"recreate");
   outputTree_u = new TTree("tree", "tree");
 }
+/*
+ * init() : initializes the branch addresses for the input and output trees
+ * 
+ *
+ *
+ *
+ *
+ */
+
 void NTUPskimmer::init()
 {
   ph_pt=0;    ph_eta=0;   ph_phi=0; ph_topoetcone40=0; ph_topoetcone30=0;
@@ -128,9 +144,6 @@ bool NTUPskimmer::Cut(){
     float looseiso = ph_pt*0.065;
     //float tightiso = pt*0.022  + 2.45; //divide to convert to GeV
     float trackiso = ph_ptcone20/ph_pt;
-    //cout << "ph_isoloose" << ph_isoloose << endl;
-    //cout << "ph_loose" << ph_loose_mc15 << endl;
-    //cout << "ph_isConv" << ph_truth_isConv << endl;
     sumW+=mc_gen_weight;
     // Pt cut
     if(pt < 8. ) return false;
@@ -192,12 +205,9 @@ bool NTUPskimmer::Cut(){
 
     }
     float totalw=wei;
-    //float puw = 0;
     if(!data){
          totalw *= mc_pu_weight;
-         //puw = mc_pu_weight;
     }
-    //float ph_weight=0;
     if (data) ph_weight=1;
     else      ph_weight=totalw;
     int count=0;
@@ -207,12 +217,22 @@ bool NTUPskimmer::Cut(){
       string rhadname =     (noFF)  ? "ph_noFF_rhad"  : "ph_rhad";
       string rhad1name =     (noFF) ? "ph_noFF_rhad1" : "ph_rhad1";
       if (inputvarname == rhad1name) continue;  // special case for rhad1, combine with rhad
-      outputVars[Config::InputVarsPskim[count]] =  inputVars[inputvarname];    
+      
+      
+      
+      // confusing line ahead! It sets the output tree variable to the value in the input tree variable
+      // They have different iterators because of the rhad1 case when it is combined with rhad,
+      // so there are more input variables than output variables.  
+      string outputvarname= Config::InputVarsPskim[count];
+      outputVars[outputvarname] =  inputVars[inputvarname];    
+      
+      
+      
+      
       if ( inputvarname==rhadname && (fabs(ph_eta) < 0.8 || fabs(ph_eta)>1.37) )
       {
         outputVars[rhadname] =  inputVars[rhad1name];
       }
-      //cout << "value: " << value << "  weight: " << ph_weight << endl;
       count ++;
     }
     if (conv_photon)   outputTree_c->Fill();

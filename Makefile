@@ -61,6 +61,9 @@ getFFsFromSkim: $(OBJS) $(getFFsFromSkim_OBJS) $(DEPS) $(getFFsFromSkim_DEPS)
 	if [ -a getFFsFromSkim ]; then rm getFFsFromSkim ; fi;
 	$(CXX) -o $@ $(OBJS) $(getFFsFromSkim_OBJS) $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/getFFsFromSkim.C 
 
+compare: $(OBJS) libs/FFcalcAndCompare.o 
+	$(CXX) -o $@ $(OBJS) libs/FFcalcAndCompare.o $(CXXFLAGS) $(ROOTCORE_INCL) $(LIBS) utils/compare.C
+
 
 # suffix rule
 .cc.o:

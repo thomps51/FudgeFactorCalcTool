@@ -2,6 +2,7 @@
 #define CONFIG_H
 #include <string>
 #include <sys/stat.h>
+#include <vector>
 using namespace std;
 class Config{
   public:
