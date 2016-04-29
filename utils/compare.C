@@ -12,6 +12,4 @@ int main(int argc, char **argv)
 
   FFcalcAndCompare * FFobj_u = new FFcalcAndCompare("output/pdfs/pdfs_data_u.root","output/pdfs/pdfs_mc_u.root","u");
   FFobj_u->Run();
-
-
 }
