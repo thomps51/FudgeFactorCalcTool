@@ -2,6 +2,7 @@
 
 FFcalc::FFcalc(vector<vector<vector<TH1 *> > > &data_PDFs ,vector<vector<vector<TH1 *> > > &mc_PDFs, string convSt)
 {
+  gStyle->SetOptStat(0);
   dataPDFs   = data_PDFs;
   mcPDFs     = mc_PDFs;
   convStatus = convSt;
@@ -12,6 +13,7 @@ FFcalc::FFcalc(vector<vector<vector<TH1 *> > > &data_PDFs ,vector<vector<vector<
 }
 FFcalc::FFcalc(string data_PDFs_filename ,string mc_PDFs_filename, string convSt)
 {
+  gStyle->SetOptStat(0);
   cout << "FFCalc:: getting data PDFs from file " << data_PDFs_filename << endl;
   convStatus = convSt;
   if (convSt != "u" && convSt != "c")
@@ -65,19 +67,28 @@ float FFcalc::getXsq(TH1 * dataHist, TH1* NmcHist, int shift) {
 }
 // Do a polynomial function fit to the chi-sq distribution to get statistical error
 // Determine the FF away from the minimum where the chi-sq goes up by 1
-float FFcalc::GetFFerror(TH1F * chiSqHisto, int shift_min)
+float FFcalc::GetFFerror(TH1F * chiSqHisto, int shift_min, int var, int etBin, int etaBin)
 {
+  string tcanvasName=Config::varsN[var]+Config::etNames[etBin]+Config::etaNames[etaBin]+"_fit_"+convStatus;
+  TCanvas * c1 = new TCanvas(tcanvasName.c_str());
+  chiSqHisto->Draw();
   int optimalShift = chiSqHisto->GetMinimumBin() + shift_min - 1;
-  TF1 *myfit = new TF1("myfit","pol2");
+  //double minValue= chiSqHisto->GetMinimum(1);
+  string fitName="myfit"+tcanvasName;
+  TF1 *myfit = new TF1(fitName.c_str(),"pol2", (optimalShift-5)*chiSqHisto->GetBinWidth(2), (optimalShift+5)*chiSqHisto->GetBinWidth(2));
   chiSqHisto->Fit(myfit,"QN","",(optimalShift-5)*chiSqHisto->GetBinWidth(2),(optimalShift+5)*chiSqHisto->GetBinWidth(2));
+  myfit->Draw("same");
+  //myfit->Draw("");
   Double_t p0 = myfit->GetParameter(0);
   Double_t p1 = myfit->GetParameter(1);
   Double_t p2 = myfit->GetParameter(2);
   Double_t min = -p1/(2*p2);
   Double_t miny = p0+p1*(min)+p2*(min)*(min);
-  Double_t xMinPlus= (-p1 + sqrt(p1*p1-4*p2*(p0-(miny+1))) ) / (2 * p2);
+  Double_t xMinPlus= (-p1 + sqrt(p1*p1-4*p2*(p0- ( miny + Config::Nbins ))) ) / (2 * p2);
   Double_t Error = xMinPlus - min;
-  
+ 
+  chiSqWithFit.push_back(c1); 
+
   return Error; 
 }
 FudgeFactor FFcalc::GetFF(TH1 * dataHist, TH1 * mcHist, int var, int etBin, int etaBin)
@@ -109,7 +120,7 @@ FudgeFactor FFcalc::GetFF(TH1 * dataHist, TH1 * mcHist, int var, int etBin, int 
 
   int optimalBinShift = minBinShift;
   double FFvalue       = binWidth * optimalBinShift; 
-  double FFerror       = GetFFerror(chiSqHisto,shift_min);
+  double FFerror       = GetFFerror(chiSqHisto,shift_min,var,etBin,etaBin);
   FudgeFactor thisFF(chiSqHisto,dataHist,mcHist,optimalBinShift,FFvalue,FFerror);
   return thisFF;
 }
@@ -151,6 +162,7 @@ void FFcalc::Run()
   writeErrorsToCFile();
   writePlotsToFile();
   writeFFsToRootFile();
+  writeChiSqWithFitPlots();
 }
 void FFcalc::writePlotsToFile()
 {
@@ -318,4 +330,14 @@ void FFcalc::writeErrorsToCFile()
     }
   }
   myfile.close();
+}
+void FFcalc::writeChiSqWithFitPlots()
+{
+  string filename = Config::FFsOutputDir+"/FF_chiSqFit_" + convStatus + ".root";
+  TFile * f = new TFile(filename.c_str(),"recreate");
+  for(unsigned int i = 0; i< chiSqWithFit.size();i++)
+  {
+    chiSqWithFit[i]->Write();
+  }
+  f->Close();
 }
