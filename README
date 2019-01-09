@@ -1,3 +1,5 @@
+This code is quite old and commits a number of C++ cardinal sins that I wish to be forgiven for.
+
 This program is used for calculating Fudge Factors, which are shifts for simulated Monte Carlo 
 data variable distributions to better match actual data.  Fudge Factors are a bit of a hack, 
 but they are the best thing we can do, short of 100% perfect detector modeling.
